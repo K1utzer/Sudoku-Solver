@@ -1,0 +1,5 @@
+py-sudoku
+numpy
+opencv-python
+pytesseract
+pyautogui

@@ -5,7 +5,7 @@ import pytesseract
 import re
 from sudoku import Sudoku
 
-pytesseract.pytesseract.tesseract_cmd = r'path_to_tesseract_exe'
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 MatLike = np.ndarray
 
@@ -41,18 +41,45 @@ def find_chessboard_contour(image: MatLike) -> np.ndarray:
                     max_area = area
     return chessboard_contour
 
+def recognize_digit(cropped_img: np.ndarray, config: list[str]) -> int:
+    potential_nine = False
+    for cfg in config:
+        text = pytesseract.image_to_string(cropped_img, config=cfg)
+        numbers = re.findall(r"\d+", text)
+        if numbers:
+            value = int(numbers[0])
+            if 1 <= value <= 9:
+                return value
+        else:
+            if re.search(r"[A-Za-z]", text) is not None:
+                potential_nine = True
+    return 0 if not potential_nine else 9 # 9 is inconsistent with tessract
+
 def extract_board(gray_image: MatLike, contour: np.ndarray) -> np.ndarray:
     x, y, w, h = cv2.boundingRect(contour)
     single_field_w, single_field_h = int(w / 9), int(h / 9)
-    binary_image = cv2.threshold(gray_image[y+5:y+h-2, x+5:x+w-2], 128, 255, cv2.THRESH_BINARY)[1]
+    binary_image = cv2.threshold(gray_image[y+5:y+h-2, x+5:x+w-2], 150, 255, cv2.THRESH_BINARY)[1]
     board = []
+    config = [
+            r'--oem 1 --psm 10 -c user_defined_dpi=300 '
+            r'-c load_system_dawg=false -c load_freq_dawg=false '
+            r'-c classify_bln_numeric_mode=1',
+
+            r'--oem 1 --psm 6 -c user_defined_dpi=300 '
+            r'-c tessedit_char_whitelist=123456789 '
+            r'-c load_system_dawg=false -c load_freq_dawg=false '
+            r'-c classify_bln_numeric_mode=1',
+
+            r'--oem 1 --psm 6 -c user_defined_dpi=300 '
+            r'-c load_system_dawg=false -c load_freq_dawg=false '
+            r'-c classify_bln_numeric_mode=1',
+    ]
     for y1 in range(0, h - single_field_h, single_field_h):
         board_ver = []
         for x1 in range(0, w - single_field_w, single_field_w):
             cropped_img = binary_image[y1+2:y1+single_field_h-5, x1+2:x1+single_field_w-5]
-            text = pytesseract.image_to_string(cropped_img, config=r'--oem 3 --psm 6 -c tessedit_char_whitelist=123456789')
-            numbers = re.findall(r'\d+', text)
-            board_ver.append(int(numbers[0]) if numbers else 0)
+            digit = recognize_digit(cropped_img, config)
+            board_ver.append(digit)
         board.append(board_ver)
 
     return np.array(board), x, y, single_field_w, single_field_h
@@ -80,9 +107,8 @@ def solve_and_insert_sudoku(original_board: np.ndarray, x: int, y: int, single_f
     original_board = remove_duplicates(original_board)
     puzzle = Sudoku(3, 3, board=original_board.tolist())
     print(puzzle)
-    solved_board = puzzle.solve(raising=True).board
+    solved_board = puzzle.solve().board
     print(puzzle.solve())
-
     for i in range(9):
         for j in range(9):
             if original_board[i][j] == 0 and solved_board[i][j] != 0:

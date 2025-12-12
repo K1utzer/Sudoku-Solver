@@ -117,7 +117,7 @@ def solve_and_insert_sudoku(original_board: np.ndarray, x: int, y: int, single_f
                 insert_number(x3, y3, solved_board[i][j])
 
 def main():
-    image = screenshot()
+    image = screenshot()        
     eroded = preprocess_image(image)
     chessboard_contour = find_chessboard_contour(eroded)
     if chessboard_contour is not None:

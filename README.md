@@ -5,25 +5,28 @@ This project automatically solves Sudokus on websites like [sudoku.com](https://
 ## Installation
 
 1. **Install Python and Dependencies**:
-    Ensure you have Python 3.x installed on your system. Install the required Python packages using:
+   Ensure you have Python 3.x installed on your system. Install the required Python packages using:
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 2. **Install Tesseract OCR**:
-    This project uses Tesseract for optical character recognition (OCR). Install Tesseract:
+   This project uses Tesseract for optical character recognition (OCR). Install Tesseract:
 
-    https://github.com/tesseract-ocr/tesseract/releases)
-
+   https://github.com/tesseract-ocr/tesseract/releases)
 
 ## Usage
 
 1. **Extract Sudoku Board**:
-    The Sudoku Solver extracts the Sudoku board from an screenshot. The extraction process is based on contour detection and subsequent extraction of individual cells.
+   The Sudoku Solver extracts the Sudoku board from an screenshot. The extraction process is based on contour detection and subsequent extraction of individual cells.
 
 2. **Optical Character Recognition**:
-    Each cell is analyzed using Tesseract OCR to recognize the numbers it contains.
+   Each cell is analyzed using Tesseract OCR to recognize the numbers it contains.
 
 3. **Solve Sudoku**:
-    Once the Sudoku board is extracted and the numbers are recognized, the Sudoku is automatically solved.
+   Once the Sudoku board is extracted and the numbers are recognized, the Sudoku is automatically solved.
+
+## Image processing
+
+![Image processing](doc/iamge_processing.jpg)

@@ -29,4 +29,4 @@ This project automatically solves Sudokus on websites like [sudoku.com](https://
 
 ## Image processing
 
-![Image processing](doc/iamge_processing.jpg)
+![Image processing](docs/iamge_processing.jpg)
